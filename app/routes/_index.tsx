@@ -7,7 +7,7 @@ export default function Index() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "letmein") {
+    if (password === "westy731") {
       navigate("/home"); // redirect to your list route
     } else {
       alert("Incorrect password");
