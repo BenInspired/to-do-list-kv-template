@@ -1,11 +1,22 @@
 import {
   type LoaderFunctionArgs,
   type ActionFunctionArgs,
+  redirect,
 } from "@remix-run/cloudflare";
 import { useLoaderData, Form } from "@remix-run/react";
 import { TodoManager } from "~/to-do-manager";
 
-export const loader = async ({ params, context }: LoaderFunctionArgs) => {
+// --- helper to check cookie ---
+function isAuthenticated(request: Request) {
+  const cookie = request.headers.get("Cookie");
+  return cookie && cookie.includes("auth=ok");
+}
+
+export const loader = async ({ params, context, request }: LoaderFunctionArgs) => {
+  if (!isAuthenticated(request)) {
+    return redirect("/"); // force login if not authed
+  }
+
   const todoManager = new TodoManager(
     context.cloudflare.env.TO_DO_LIST,
     params.id,
@@ -15,12 +26,22 @@ export const loader = async ({ params, context }: LoaderFunctionArgs) => {
 };
 
 export async function action({ request, context, params }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const intent = formData.get("intent");
+
+  // handle logout
+  if (intent === "logout") {
+    return redirect("/", {
+      headers: {
+        "Set-Cookie": `auth=; Path=/; HttpOnly; Max-Age=0`,
+      },
+    });
+  }
+
   const todoManager = new TodoManager(
     context.cloudflare.env.TO_DO_LIST,
     params.id,
   );
-  const formData = await request.formData();
-  const intent = formData.get("intent");
 
   switch (intent) {
     case "create": {
@@ -48,12 +69,26 @@ export async function action({ request, context, params }: ActionFunctionArgs) {
   }
 }
 
-export default function () {
+export default function TodoPage() {
   const { todos } = useLoaderData<typeof loader>();
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8 px-4">
       <div className="max-w-md mx-auto">
+        {/* lock button top right */}
+        <div className="flex justify-end mb-4">
+          <Form method="post">
+            <button
+              type="submit"
+              name="intent"
+              value="logout"
+              className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition"
+            >
+              🔒 Lock
+            </button>
+          </Form>
+        </div>
+
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-8">
           Todo List
         </h1>
