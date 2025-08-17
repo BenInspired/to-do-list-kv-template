@@ -11,6 +11,7 @@ export const action = async ({ request }: { request: Request }) => {
     return new Response(null, {
       status: 302,
       headers: {
+        // set cookie so user stays logged in
         "Set-Cookie": `auth=ok; Path=/; HttpOnly; SameSite=Lax`,
         Location: "/",
       },
@@ -42,19 +43,20 @@ export default function Index() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#f3f4f6", // light gray background
+        background: "#222224", // dark background
         fontFamily: "system-ui, sans-serif",
       }}
     >
       <div
         style={{
-          background: "white",
+          background: "#2e2e32",
           padding: "2.5rem",
           borderRadius: "1rem",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
           width: "100%",
           maxWidth: "380px",
           textAlign: "center",
+          color: "white",
         }}
       >
         <h2
@@ -62,7 +64,6 @@ export default function Index() {
             marginBottom: "1.5rem",
             fontSize: "1.5rem",
             fontWeight: 600,
-            color: "#111827",
           }}
         >
           🔒 Enter Password
@@ -82,7 +83,9 @@ export default function Index() {
               width: "100%",
               marginBottom: "1rem",
               borderRadius: "0.75rem",
-              border: "1px solid #d1d5db",
+              border: "1px solid #444",
+              background: "#1c1c1f",
+              color: "white",
               fontSize: "1rem",
               outline: "none",
             }}
@@ -101,22 +104,3 @@ export default function Index() {
               width: "100%",
               transition: "background 0.2s",
             }}
-            onMouseOver={(e) =>
-              ((e.target as HTMLButtonElement).style.background = "#1d4ed8")
-            }
-            onMouseOut={(e) =>
-              ((e.target as HTMLButtonElement).style.background = "#2563eb")
-            }
-          >
-            Unlock
-          </button>
-        </Form>
-        {error && (
-          <p style={{ color: "#dc2626", marginTop: "1rem", fontSize: "0.9rem" }}>
-            Wrong password. Try again.
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}
