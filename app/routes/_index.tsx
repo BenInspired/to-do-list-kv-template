@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { Form, useNavigate } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 
 export default function Index() {
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === "westy731") {
-      navigate("/home"); // redirect to your list route
+      // ✅ redirect to your first todo list page (replace "default" with your ID)
+      navigate("/default");
     } else {
-      alert("Incorrect password");
+      setError("Incorrect password");
     }
   };
 
@@ -36,6 +38,9 @@ export default function Index() {
         >
           Unlock
         </button>
+        {error && (
+          <p className="text-red-500 text-sm text-center">{error}</p>
+        )}
       </form>
     </div>
   );
